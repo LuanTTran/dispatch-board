@@ -49,7 +49,7 @@ export function QueuePanel({ className }: QueuePanelProps): React.ReactElement {
       ) : (
         <>
           {sourceCount > 0 ? (
-            <p className="border-b border-border px-panel-padding py-1.5 text-xs text-muted-foreground">
+            <p className="border-b border-border px-panel-padding py-1 text-xs text-muted-foreground">
               Connected — {sourceCount} work order{sourceCount === 1 ? "" : "s"} from ontology
             </p>
           ) : null}

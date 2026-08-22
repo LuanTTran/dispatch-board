@@ -20,8 +20,8 @@ export type LayoutTokens = {
 
 export const layoutTokens: LayoutTokens = {
   workspacePadding: "0.75rem",
-  workspaceGap: "0.75rem",
-  panelPadding: "1.25rem",
+  workspaceGap: "0.5rem",
+  panelPadding: "1rem",
   sidebarWidth: "15rem",
   queueWidth: "16.25rem",
   radius: "0.875rem",

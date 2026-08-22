@@ -134,7 +134,7 @@ function OperationsJobContent({
   return (
     <>
       <ScrollArea className="min-h-0 flex-1">
-        <div className="flex flex-col gap-4 p-panel-padding">
+        <div className="flex flex-col gap-3 p-panel-padding">
           <JobCardHeader job={focusedJob} />
           <Separator />
           <JobDetailsExpander
@@ -237,7 +237,7 @@ export function OperationsPanel({ className }: OperationsPanelProps): React.Reac
       ) : (
         <>
           {techError != null ? (
-            <div className="border-b border-border px-panel-padding py-2">
+            <div className="border-b border-border px-panel-padding py-1.5">
               <Alert variant="destructive">
                 <AlertTitle>Technician list unavailable</AlertTitle>
                 <AlertDescription className="text-balance">{techError.message}</AlertDescription>

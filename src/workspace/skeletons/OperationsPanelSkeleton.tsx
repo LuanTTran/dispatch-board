@@ -12,7 +12,7 @@ export function OperationsPanelSkeleton(): React.ReactElement {
       aria-busy="true"
       aria-label="Loading operations"
     >
-      <div className="flex flex-col gap-4 p-panel-padding">
+      <div className="flex flex-col gap-3 p-panel-padding">
         <header className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <Skeleton className="h-5 w-28 rounded-md" />
