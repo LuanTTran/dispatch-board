@@ -4,18 +4,23 @@ import { TECH_MARKER_PIXEL_OFFSET } from "@/constants/spatial";
 import type { QueueUrgency } from "@/lenses/queue/types";
 import { siteUrgencyPinClass } from "@/spatial/siteUrgencyStyle";
 
-/** Leaflet DivIcon for a site pin circle with optional focus ring. */
+/** Leaflet DivIcon for a site pin circle with optional focus ring and job count. */
 export function createSiteMarkerIcon(
   urgency: QueueUrgency,
   isFocused: boolean,
+  workOrderCount: number,
 ): L.DivIcon {
   const urgencyClass = siteUrgencyPinClass[urgency];
-  const size = isFocused ? 20 : 14;
+  const size = isFocused ? 24 : 18;
   const ringClass = isFocused ? "site-marker-pin--focused" : "";
+  const countBadge =
+    workOrderCount > 1
+      ? `<span class="site-marker-count">${workOrderCount}</span>`
+      : "";
 
   return L.divIcon({
     className: "site-marker-icon",
-    html: `<div class="site-marker-pin ${urgencyClass} ${ringClass}" aria-hidden="true"></div>`,
+    html: `<div class="site-marker-pin ${urgencyClass} ${ringClass}" aria-hidden="true">${countBadge}</div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });

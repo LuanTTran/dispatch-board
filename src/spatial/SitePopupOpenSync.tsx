@@ -20,6 +20,9 @@ export function SitePopupOpenSync({
 
     const timer = window.setTimeout(() => {
       markerRef.current?.openPopup();
+      requestAnimationFrame(() => {
+        markerRef.current?.getPopup()?.update();
+      });
     }, MAP_FOCUS_FLY_TO_DURATION_MS + 50);
 
     return () => {

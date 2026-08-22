@@ -1,7 +1,7 @@
 /** Page size for CustomerSite fetch. Seed has 18 rows with headroom for growth. */
 export const CUSTOMER_SITES_PAGE_SIZE = 40;
 
-/** Matches MapFocusSync flyTo duration so the popup opens after pan completes. */
+/** Matches map focus animation duration so the popup opens after pan completes. */
 export const MAP_FOCUS_FLY_TO_DURATION_MS = 750;
 
 /** Pixels NE of co-located site dot so tech triangle does not cover urgency pin. */
@@ -19,3 +19,9 @@ export const CHICAGO_HUB_COORDS = {
   longitude: -87.6298,
   label: "Chicago Hub",
 } as const;
+
+/** Scroll cap for multi-job site popups so autopan can keep them in view at higher zoom. */
+export const SITE_POPUP_MAX_HEIGHT = 240;
+
+/** Viewport margin Leaflet uses when autopanning to fit a site popup. */
+export const SITE_POPUP_AUTO_PAN_PADDING: [number, number] = [20, 20];

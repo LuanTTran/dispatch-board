@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 import { AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +29,15 @@ export function MapPanel({ className }: MapPanelProps): React.ReactElement {
     refetch: refetchTechnicians,
   } = useMapTechnicians();
 
+  const hasLoadedOnceRef = useRef(false);
   const isLoading = sitesLoading || techniciansLoading;
+
+  if (!isLoading) {
+    hasLoadedOnceRef.current = true;
+  }
+
+  const showInitialSkeleton = isLoading && !hasLoadedOnceRef.current;
+  const showMap = hasLoadedOnceRef.current;
   const hasPartialError = sitesError != null || techniciansError != null;
 
   const handleRetry = (): void => {
@@ -63,15 +73,14 @@ export function MapPanel({ className }: MapPanelProps): React.ReactElement {
         </div>
       ) : null}
 
-      {isLoading ? (
-        <MapPanelSkeleton />
-      ) : (
+      {showInitialSkeleton ? <MapPanelSkeleton /> : null}
+      {showMap ? (
         <ChicagolandMap
           className="min-h-0 flex-1"
           sites={sitesError != null ? [] : sites}
           technicians={techniciansError != null ? [] : technicians}
         />
-      )}
+      ) : null}
     </WorkspacePanel>
   );
 }

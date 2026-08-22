@@ -1,16 +1,85 @@
-import { useMemo } from "react";
+import { memo, useCallback } from "react";
 
-import { MapFocusSync } from "@/spatial/MapFocusSync";
+import type { WorkOrderFocusSource } from "@/workspace/focusSource";
+import { MapQueueFocusBridge } from "@/spatial/MapQueueFocusBridge";
+import { MapViewportBridge } from "@/spatial/MapViewportBridge";
 import { SiteMarker } from "@/spatial/SiteMarker";
 import { TechnicianMarker } from "@/spatial/TechnicianMarker";
 import type { MapSiteData, MapTechnicianData } from "@/spatial/types";
-import { getMapSiteForWorkOrder } from "@/utils/spatial/mapMapSite";
 import { useWorkspaceSelection } from "@/workspace/WorkspaceSelectionProvider";
 
 type SpatialMapLayerProps = {
   sites: MapSiteData[];
   technicians: MapTechnicianData[];
 };
+
+type MapSiteMarkersLayerProps = {
+  sites: MapSiteData[];
+  focusedWorkOrderId: string | null;
+  focusSource: WorkOrderFocusSource | null;
+  onSelectWorkOrder: (workOrderId: string) => void;
+};
+
+type MapTechnicianMarkersLayerProps = {
+  technicians: MapTechnicianData[];
+  compareTechnicianIds: string[];
+};
+
+const MapSiteMarkersLayer = memo(function MapSiteMarkersLayer({
+  sites,
+  focusedWorkOrderId,
+  focusSource,
+  onSelectWorkOrder,
+}: MapSiteMarkersLayerProps): React.ReactElement {
+  return (
+    <>
+      {sites.map((site) => {
+        const isFocused =
+          focusedWorkOrderId !== null &&
+          site.workOrders.some(
+            (workOrder) => workOrder.workOrderId === focusedWorkOrderId,
+          );
+
+        return (
+          <SiteMarker
+            key={site.siteId}
+            site={site}
+            isFocused={isFocused}
+            focusedWorkOrderId={isFocused ? focusedWorkOrderId : null}
+            interactionMode={
+              isFocused && focusSource === "queue" ? "queue-focus" : "map-pick"
+            }
+            onSelectWorkOrder={onSelectWorkOrder}
+          />
+        );
+      })}
+    </>
+  );
+});
+
+const MapTechnicianMarkersLayer = memo(function MapTechnicianMarkersLayer({
+  technicians,
+  compareTechnicianIds,
+}: MapTechnicianMarkersLayerProps): React.ReactElement {
+  return (
+    <>
+      {technicians.map((technician) => {
+        const isCompareSelected = compareTechnicianIds.includes(
+          technician.technicianId,
+        );
+
+        return (
+          <TechnicianMarker
+            key={technician.technicianId}
+            technician={technician}
+            isCompareSelected={isCompareSelected}
+            zIndexOffset={isCompareSelected ? 200 : 50}
+          />
+        );
+      })}
+    </>
+  );
+});
 
 /** Renders site and tech markers plus map focus sync from MapPanel OSDK data. */
 export function SpatialMapLayer({
@@ -20,46 +89,31 @@ export function SpatialMapLayer({
   const { focusedWorkOrderId, focusSource, setFocusedWorkOrderId, compareTechnicianIds } =
     useWorkspaceSelection();
 
-  const handleSelectWorkOrderFromMap = (workOrderId: string): void => {
-    setFocusedWorkOrderId(workOrderId, { source: "map" });
-  };
-
-  const focusedSite = useMemo(
-    () =>
-      focusedWorkOrderId !== null
-        ? getMapSiteForWorkOrder(sites, focusedWorkOrderId)
-        : undefined,
-    [focusedWorkOrderId, sites],
+  const handleSelectWorkOrderFromMap = useCallback(
+    (workOrderId: string): void => {
+      setFocusedWorkOrderId(workOrderId, { source: "map" });
+    },
+    [setFocusedWorkOrderId],
   );
 
   return (
     <>
-      {sites.map((site) => (
-        <SiteMarker
-          key={site.siteId}
-          site={site}
-          focusedWorkOrderId={focusedWorkOrderId}
-          focusSource={focusSource}
-          onSelectWorkOrder={handleSelectWorkOrderFromMap}
-        />
-      ))}
-
-      {technicians.map((technician) => (
-        <TechnicianMarker
-          key={technician.technicianId}
-          technician={technician}
-          isCompareSelected={compareTechnicianIds.includes(technician.technicianId)}
-          zIndexOffset={compareTechnicianIds.includes(technician.technicianId) ? 200 : 50}
-        />
-      ))}
-
-      {focusedSite !== undefined ? (
-        <MapFocusSync
-          key={focusedWorkOrderId ?? "none"}
-          latitude={focusedSite.latitude}
-          longitude={focusedSite.longitude}
-        />
-      ) : null}
+      <MapViewportBridge />
+      <MapQueueFocusBridge
+        sites={sites}
+        focusedWorkOrderId={focusedWorkOrderId}
+        focusSource={focusSource}
+      />
+      <MapSiteMarkersLayer
+        sites={sites}
+        focusedWorkOrderId={focusedWorkOrderId}
+        focusSource={focusSource}
+        onSelectWorkOrder={handleSelectWorkOrderFromMap}
+      />
+      <MapTechnicianMarkersLayer
+        technicians={technicians}
+        compareTechnicianIds={compareTechnicianIds}
+      />
     </>
   );
 }

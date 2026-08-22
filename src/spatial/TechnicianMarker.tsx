@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Marker, Popup } from "react-leaflet";
 
 import { createTechnicianMarkerIcon } from "@/spatial/markerIcons";
@@ -12,7 +12,7 @@ type TechnicianMarkerProps = {
 };
 
 /** Last-known technician position. Compare selection adds a secondary highlight ring. */
-export function TechnicianMarker({
+export const TechnicianMarker = memo(function TechnicianMarker({
   technician,
   isCompareSelected,
   zIndexOffset = 50,
@@ -33,4 +33,4 @@ export function TechnicianMarker({
       </Popup>
     </Marker>
   );
-}
+});

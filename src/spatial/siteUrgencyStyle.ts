@@ -21,3 +21,10 @@ export function getPeakSiteUrgency(workOrders: MapSiteWorkOrder[]): QueueUrgency
     "normal",
   );
 }
+
+/** Stack critical sites above warning, then normal. Tech pins use a higher base offset. */
+export const siteUrgencyZIndex: Record<QueueUrgency, number> = {
+  critical: 30,
+  warning: 20,
+  normal: 10,
+};

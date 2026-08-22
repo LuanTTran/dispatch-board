@@ -1,4 +1,5 @@
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MapMarkerLegend } from "@/spatial/MapMarkerLegend";
 
 /** Context bar above the grid showing region and filter copy. */
 export function WorkspaceHeader(): React.ReactElement {
@@ -17,7 +18,10 @@ export function WorkspaceHeader(): React.ReactElement {
         </span>
         <span className="truncate text-muted-foreground">Urgent refrigeration</span>
       </div>
-      <ThemeToggle className="relative shrink-0" />
+      <div className="flex shrink-0 items-center gap-1.5">
+        <MapMarkerLegend />
+        <ThemeToggle className="relative shrink-0" />
+      </div>
     </header>
   );
 }

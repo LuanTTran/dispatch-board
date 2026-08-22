@@ -142,34 +142,58 @@ body {
 }
 
 .site-marker-pin {
-  width: 14px;
-  height: 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
   border-radius: 9999px;
-  border: 2px solid;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  border: 3px solid;
+  box-shadow:
+    0 0 0 1.5px var(--background),
+    0 1px 4px rgb(0 0 0 / 0.35);
 }
 
 .site-marker-pin--critical {
   background: var(--status-danger);
-  border-color: color-mix(in oklch, var(--status-danger-foreground) 30%, transparent);
+  border-color: var(--status-danger-foreground);
 }
 
 .site-marker-pin--warning {
   background: var(--status-warning);
-  border-color: color-mix(in oklch, var(--status-warning-foreground) 30%, transparent);
+  border-color: var(--status-warning-foreground);
 }
 
 .site-marker-pin--normal {
-  background: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
-  border-color: var(--border);
+  background: var(--card);
+  border-color: var(--muted-foreground);
 }
 
 .site-marker-pin--focused {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   box-shadow:
-    0 0 0 3px color-mix(in oklch, var(--primary) 35%, transparent),
-    0 1px 4px rgb(0 0 0 / 0.3);
+    0 0 0 1.5px var(--background),
+    0 0 0 4px color-mix(in oklch, var(--primary) 40%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.35);
+}
+
+.site-marker-count {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  min-width: 13px;
+  height: 13px;
+  padding: 0 3px;
+  border-radius: 9999px;
+  background: var(--foreground);
+  color: var(--background);
+  font:
+    600 9px/13px system-ui,
+    sans-serif;
+  text-align: center;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
 }
 
 .tech-marker-pin {
@@ -211,6 +235,11 @@ body {
   background: var(--popover);
   color: var(--popover-foreground);
   border: 1px solid var(--border);
+}
+
+.leaflet-popup.spatial-popup .leaflet-popup-content.leaflet-popup-scrolled {
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .leaflet-popup.spatial-popup .leaflet-popup-tip {
