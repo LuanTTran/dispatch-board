@@ -1,0 +1,7 @@
+assignmentId,workOrderId,technicianId,status,assignedAt,assignedBy
+ASGN-001,WO-001,Tech-02,confirmed,2026-07-29T16:00:00-05:00,coordinator.alice
+ASGN-002,WO-005,Tech-04,confirmed,2026-07-29T16:40:00-05:00,coordinator.alice
+ASGN-003,WO-010,Tech-01,confirmed,2026-07-29T16:30:00-05:00,coordinator.bob
+ASGN-004,WO-015,Tech-06,confirmed,2026-07-29T16:45:00-05:00,coordinator.bob
+ASGN-005,WO-025,Tech-09,confirmed,2026-07-29T17:15:00-05:00,coordinator.alice
+ASGN-006,WO-012,Tech-08,pending,2026-07-29T17:50:00-05:00,coordinator.bob

@@ -1,0 +1,11 @@
+decisionId,workOrderId,decisionType,reason,timestamp,actor
+DEC-001,WO-001,confirm_dispatch,Tech-02 closest with SKU-006 on truck,2026-07-29T16:00:00-05:00,coordinator.alice
+DEC-002,WO-005,confirm_dispatch,Partner tech in territory; hub backup available,2026-07-29T16:40:00-05:00,coordinator.alice
+DEC-003,WO-010,confirm_dispatch,Green path — SKU-002 on truck,2026-07-29T16:30:00-05:00,coordinator.bob
+DEC-004,WO-015,confirm_dispatch,Low confidence acknowledged; senior tech assigned,2026-07-29T16:45:00-05:00,coordinator.bob
+DEC-005,WO-020,hold,parts_pick — awaiting hub pull for SKU-018,2026-07-29T17:00:00-05:00,coordinator.alice
+DEC-006,WO-025,confirm_dispatch,Yellow path — hub stock confirmed,2026-07-29T17:15:00-05:00,coordinator.alice
+DEC-007,WO-012,confirm_dispatch,Pending coordinator review,2026-07-29T17:50:00-05:00,coordinator.bob
+DEC-008,WO-007,override_attempt,Rejected — tech at daily cap,2026-07-29T17:30:00-05:00,coordinator.bob
+DEC-009,WO-003,candidate_review,Compared Tech-07 vs Tech-01 — green truck path,2026-07-29T17:55:00-05:00,coordinator.alice
+DEC-010,WO-021,parts_guard_block,Red path — SKU-040 unavailable truck and hub,2026-07-29T17:45:00-05:00,coordinator.alice

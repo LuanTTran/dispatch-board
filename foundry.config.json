@@ -1,0 +1,11 @@
+{
+  "foundryUrl": "https://brextontran.usw-3.palantirfoundry.com",
+  "site": {
+    "application": "ri.third-party-applications.main.application.195cec9f-6d21-4b64-a59d-f98aab5e1e9d",
+    "directory": "./dist",
+    "autoVersion": {
+      "type": "git-describe",
+      "tagPrefix": ""
+    }
+  }
+}

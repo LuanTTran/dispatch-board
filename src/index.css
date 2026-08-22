@@ -1,0 +1,243 @@
+@import "normalize.css";
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Layout and chart CSS variables are injected by ThemeStyles from layout.ts and theme.ts. */
+
+#root-container {
+  display: flex;
+  flex: 1;
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
+  min-height: 0;
+  width: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  min-height: 100vh;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@theme inline {
+  --font-heading: "Stack Sans Headline", "Google Sans Flex", system-ui, sans-serif;
+  --font-sans: "Google Sans Flex", system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --color-status-success: var(--status-success);
+  --color-status-success-foreground: var(--status-success-foreground);
+  --color-status-success-muted: var(--status-success-muted);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-foreground: var(--status-warning-foreground);
+  --color-status-warning-muted: var(--status-warning-muted);
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-foreground: var(--status-danger-foreground);
+  --color-status-danger-muted: var(--status-danger-muted);
+  --color-status-info: var(--status-info);
+  --color-status-info-foreground: var(--status-info-foreground);
+  --color-status-info-muted: var(--status-info-muted);
+  --color-status-delayed: var(--status-delayed);
+  --color-status-delayed-foreground: var(--status-delayed-foreground);
+  --color-status-delayed-muted: var(--status-delayed-muted);
+  --spacing-workspace-padding: var(--workspace-padding);
+  --spacing-workspace-gap: var(--workspace-gap);
+  --spacing-panel-padding: var(--panel-padding);
+  --spacing-sidebar-width: var(--sidebar-width);
+  --spacing-queue-width: var(--queue-width);
+  --radius-badge: var(--radius-badge);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
+/* Leaflet fills the map panel. Z-index stays below workspace overlays. */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+.dark .leaflet-container .leaflet-control-attribution {
+  background: rgb(0 0 0 / 0.65);
+  color: var(--muted-foreground);
+}
+
+.dark .leaflet-container .leaflet-control-attribution a {
+  color: var(--foreground);
+}
+
+/* Spatial marker DivIcon pins. Transparent wrapper avoids the Leaflet default tile. */
+.site-marker-icon,
+.tech-marker-icon,
+.hub-marker-icon {
+  background: transparent;
+  border: none;
+}
+
+.site-marker-pin {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+
+.site-marker-pin--critical {
+  background: var(--status-danger);
+  border-color: color-mix(in oklch, var(--status-danger-foreground) 30%, transparent);
+}
+
+.site-marker-pin--warning {
+  background: var(--status-warning);
+  border-color: color-mix(in oklch, var(--status-warning-foreground) 30%, transparent);
+}
+
+.site-marker-pin--normal {
+  background: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
+  border-color: var(--border);
+}
+
+.site-marker-pin--focused {
+  width: 18px;
+  height: 18px;
+  box-shadow:
+    0 0 0 3px color-mix(in oklch, var(--primary) 35%, transparent),
+    0 1px 4px rgb(0 0 0 / 0.3);
+}
+
+.tech-marker-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+.tech-marker-triangle {
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 12px solid var(--primary);
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.25));
+}
+
+.tech-marker-pin--compare {
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--status-info) 55%, transparent);
+}
+
+.hub-marker-pin {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: color-mix(in oklch, var(--muted-foreground) 45%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+}
+
+.leaflet-popup.spatial-popup .leaflet-popup-content-wrapper {
+  border-radius: var(--radius);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+}
+
+.leaflet-popup.spatial-popup .leaflet-popup-tip {
+  background: var(--popover);
+  border: 1px solid var(--border);
+}
+
+/* Activity footer chip row ticker. Respects reduced motion preferences. */
+@keyframes activity-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.activity-marquee-track {
+  animation: activity-marquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .activity-marquee-track {
+    animation: none;
+  }
+
+  .activity-marquee-track > [aria-hidden="true"] {
+    display: none;
+  }
+}

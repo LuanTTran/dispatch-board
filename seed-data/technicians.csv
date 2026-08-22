@@ -1,0 +1,11 @@
+technicianId,name,employmentType,skillTags,maxDailyJobs,homeHub,lastKnownLatitude,lastKnownLongitude,locationAsOfTimestamp
+Tech-01,Maria Santos,w2,commercial_refrigeration;reach_in,6,HUB-CHI,41.8781,-87.65,2026-07-29T17:35:00-05:00
+Tech-02,James O'Brien,w2,commercial_refrigeration;walk_in,5,HUB-CHI,41.9214,-87.7,2026-07-29T17:20:00-05:00
+Tech-03,Priya Patel,w2,commercial_refrigeration;reach_in,6,HUB-CHI,41.85,-87.72,2026-07-29T17:05:00-05:00
+Tech-04,Carlos Mendez,partner,commercial_refrigeration,4,HUB-CHI,42.0334,-88.05,2026-07-29T17:40:00-05:00
+Tech-05,Angela Brooks,w2,commercial_refrigeration;walk_in,5,HUB-CHI,41.793,-87.98,2026-07-29T14:00:00-05:00
+Tech-06,David Kim,partner,commercial_refrigeration;reach_in,4,HUB-CHI,41.7508,-88.12,2026-07-29T17:25:00-05:00
+Tech-07,Marcus Johnson,w2,commercial_refrigeration;walk_in;reach_in,6,HUB-CHI,41.8925,-87.634,2026-07-29T17:45:00-05:00
+Tech-08,Sofia Rivera,partner,commercial_refrigeration,4,HUB-CHI,41.9088,-87.6796,2026-07-29T17:10:00-05:00
+Tech-09,Tom Nguyen,w2,commercial_refrigeration;reach_in,5,HUB-CHI,41.9786,-87.87,2026-07-29T17:30:00-05:00
+Tech-10,Rachel Green,partner,commercial_refrigeration;walk_in,4,HUB-CHI,41.8745,-87.6513,2026-07-29T17:15:00-05:00

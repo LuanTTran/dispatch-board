@@ -1,0 +1,33 @@
+workOrderId,status,priority,slaDeadline,symptom,equipmentCategory,region,siteId,equipmentId
+WO-001,assigned,urgent,2026-07-29T18:47:00-05:00,Walk-in cooler not holding temp — 48F and rising,commercial_refrigeration,central,SITE-001,EQ-001
+WO-002,unassigned,urgent,2026-07-29T19:04:00-05:00,Reach-in display case icing over,commercial_refrigeration,central,SITE-002,EQ-002
+WO-003,unassigned,urgent,2026-07-29T19:21:00-05:00,Compressor short cycling every 3 minutes,commercial_refrigeration,central,SITE-003,EQ-003
+WO-004,unassigned,urgent,2026-07-29T19:38:00-05:00,Walk-in freezer warm — product at risk,commercial_refrigeration,central,SITE-004,EQ-004
+WO-005,assigned,urgent,2026-07-29T19:55:00-05:00,Evaporator fan not running,commercial_refrigeration,central,SITE-005,EQ-005
+WO-006,unassigned,urgent,2026-07-29T20:12:00-05:00,Door gasket torn — condensation buildup,commercial_refrigeration,central,SITE-006,EQ-006
+WO-007,unassigned,urgent,2026-07-29T20:29:00-05:00,TXV hunting — unstable suction pressure,commercial_refrigeration,central,SITE-007,EQ-007
+WO-008,unassigned,urgent,2026-07-29T20:46:00-05:00,Defrost not initiating — heavy frost,commercial_refrigeration,central,SITE-008,EQ-008
+WO-009,unassigned,urgent,2026-07-29T21:03:00-05:00,Condenser fan failure — high head pressure,commercial_refrigeration,central,SITE-009,EQ-009
+WO-010,in_progress,urgent,2026-07-29T21:20:00-05:00,Digital controller showing E2 fault,commercial_refrigeration,central,SITE-010,EQ-010
+WO-011,unassigned,urgent,2026-07-29T21:37:00-05:00,Walk-in cooler not holding temp — 48F and rising,commercial_refrigeration,central,SITE-011,EQ-011
+WO-012,assigned,urgent,2026-07-29T21:54:00-05:00,Reach-in display case icing over,commercial_refrigeration,central,SITE-012,EQ-012
+WO-013,unassigned,urgent,2026-07-29T22:11:00-05:00,Compressor short cycling every 3 minutes,commercial_refrigeration,central,SITE-013,EQ-013
+WO-014,unassigned,urgent,2026-07-29T22:28:00-05:00,Walk-in freezer warm — product at risk,commercial_refrigeration,central,SITE-014,EQ-014
+WO-015,assigned,urgent,2026-07-29T18:45:00-05:00,Evaporator fan not running,commercial_refrigeration,central,SITE-015,EQ-015
+WO-016,unassigned,urgent,2026-07-29T19:02:00-05:00,Door gasket torn — condensation buildup,commercial_refrigeration,central,SITE-016,EQ-016
+WO-017,unassigned,urgent,2026-07-29T19:19:00-05:00,TXV hunting — unstable suction pressure,commercial_refrigeration,central,SITE-017,EQ-017
+WO-018,unassigned,urgent,2026-07-29T19:36:00-05:00,Defrost not initiating — heavy frost,commercial_refrigeration,central,SITE-018,EQ-018
+WO-019,unassigned,urgent,2026-07-29T19:53:00-05:00,Condenser fan failure — high head pressure,commercial_refrigeration,central,SITE-001,EQ-019
+WO-020,on_hold,urgent,2026-07-29T20:10:00-05:00,Digital controller showing E2 fault,commercial_refrigeration,central,SITE-002,EQ-020
+WO-021,unassigned,urgent,2026-07-29T20:27:00-05:00,Walk-in cooler not holding temp — 48F and rising,commercial_refrigeration,central,SITE-003,EQ-021
+WO-022,unassigned,urgent,2026-07-29T20:44:00-05:00,Reach-in display case icing over,commercial_refrigeration,central,SITE-004,EQ-022
+WO-023,unassigned,urgent,2026-07-29T21:01:00-05:00,Compressor short cycling every 3 minutes,commercial_refrigeration,central,SITE-005,EQ-023
+WO-024,unassigned,urgent,2026-07-29T21:18:00-05:00,Walk-in freezer warm — product at risk,commercial_refrigeration,central,SITE-006,EQ-024
+WO-025,assigned,urgent,2026-07-29T21:35:00-05:00,Evaporator fan not running,commercial_refrigeration,central,SITE-007,EQ-025
+WO-026,unassigned,urgent,2026-07-29T21:52:00-05:00,Door gasket torn — condensation buildup,commercial_refrigeration,central,SITE-008,EQ-026
+WO-027,unassigned,urgent,2026-07-29T22:09:00-05:00,TXV hunting — unstable suction pressure,commercial_refrigeration,central,SITE-009,EQ-027
+WO-028,unassigned,urgent,2026-07-29T22:26:00-05:00,Defrost not initiating — heavy frost,commercial_refrigeration,central,SITE-010,EQ-028
+WO-029,unassigned,urgent,2026-07-29T18:43:00-05:00,Condenser fan failure — high head pressure,commercial_refrigeration,central,SITE-011,EQ-001
+WO-030,unassigned,urgent,2026-07-29T19:00:00-05:00,Digital controller showing E2 fault,commercial_refrigeration,central,SITE-012,EQ-002
+WO-031,unassigned,urgent,2026-07-29T19:17:00-05:00,Walk-in cooler not holding temp — 48F and rising,commercial_refrigeration,central,SITE-013,EQ-003
+WO-032,unassigned,urgent,2026-07-29T19:34:00-05:00,Reach-in display case icing over,commercial_refrigeration,central,SITE-014,EQ-004
