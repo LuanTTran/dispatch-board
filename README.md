@@ -325,7 +325,7 @@ You need a Foundry enrollment, an ontology backed by the seed CSVs, and a client
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_ORG/dispatch-cmd-center.git
+git clone https://github.com/YOUR_ORG/dispatch-board.git
 cd dispatch-cmd-center
 npm install
 ```
