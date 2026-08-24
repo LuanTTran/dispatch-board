@@ -9,74 +9,82 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-export default tseslint.config({
-  files: ["eslint.config.mjs", "src/**/*.{js,mjs,cjs,ts,jsx,tsx}"],
-  settings: {
-    react: {
-      version: "detect",
-    },
+export default tseslint.config(
+  {
+    files: ["eslint.config.mjs", "src/**/*.{js,mjs,cjs,ts,jsx,tsx}"],
+    settings: {
+      react: {
+        version: "detect",
+      },
 
-    "import/resolver": {
-      node: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
       },
     },
-  },
-  languageOptions: {
-    globals: {
-      ...globals.browser,
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+
+      parser: tsParser,
     },
+    extends: [eslint.configs.recommended, ...tseslint.configs.recommended],
+    plugins: {
+      react: /** @type import("eslint").ESLint.Plugin */ (reactPlugin),
+      "react-refresh": reactRefresh,
+      "react-hooks": /** @type import("eslint").ESLint.Plugin */ (reactHooksPlugin),
+      "jsx-a11y": jsxA11yPlugin,
+      import: importPlugin,
+    },
+    rules: {
+      .../** @type import("eslint").Linter.RulesRecord */
+      (reactPlugin.configs.flat?.recommended.rules),
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      ...jsxA11yPlugin.configs.recommended.rules,
+      "react-refresh/only-export-components": [
+        "warn",
+        {
+          allowConstantExport: true,
+        },
+      ],
 
-    parser: tsParser,
+      eqeqeq: ["error", "always", { null: "ignore" }],
+      "no-console": "warn",
+      curly: ["error", "all"],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+        },
+      ],
+      "import/named": "error",
+      "import/default": "error",
+      "import/namespace": "error",
+      "import/no-duplicates": "error",
+      "import/no-extraneous-dependencies": "error",
+      "react/react-in-jsx-scope": "off",
+    },
   },
-  extends: [
-    eslint.configs.recommended,
-    ...tseslint.configs.recommended,
-  ],
-  plugins: {
-    "react": /** @type import("eslint").ESLint.Plugin */ (reactPlugin),
-    "react-refresh": reactRefresh,
-    "react-hooks":
-      /** @type import("eslint").ESLint.Plugin */ (reactHooksPlugin),
-    "jsx-a11y": jsxA11yPlugin,
-    "import": importPlugin,
+  {
+    files: ["src/components/ui/**/*.{tsx,jsx}"],
+    rules: {
+      "react/prop-types": "off",
+      "react-refresh/only-export-components": "off",
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+    },
   },
-  rules: {
-    ...(
-      /** @type import("eslint").Linter.RulesRecord */
-      (reactPlugin.configs.flat?.recommended.rules)
-    ),
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
-    ...jsxA11yPlugin.configs.recommended.rules,
-    "react-refresh/only-export-components": ["warn", {
-      allowConstantExport: true,
-    }],
-
-    "eqeqeq": ["error", "always", { "null": "ignore" }],
-    "no-console": "warn",
-    "curly": ["error", "all"],
-    "@typescript-eslint/no-unused-vars": ["error", {
-      "argsIgnorePattern": "^_",
-    }],
-    "import/named": "error",
-    "import/default": "error",
-    "import/namespace": "error",
-    "import/no-duplicates": "error",
-    "import/no-extraneous-dependencies": "error",
-    "react/react-in-jsx-scope": "off",
+  {
+    files: [
+      "src/workspace/WorkspaceSelectionProvider.tsx",
+      "src/workspace/CompareDataProvider.tsx",
+      "src/workspace/FoundryCurrentUserProvider.tsx",
+    ],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
   },
-}, {
-  files: ["src/components/ui/**/*.{tsx,jsx}"],
-  rules: {
-    "react/prop-types": "off",
-    "react-refresh/only-export-components": "off",
-    "jsx-a11y/click-events-have-key-events": "off",
-    "jsx-a11y/no-noninteractive-element-interactions": "off",
-  },
-}, {
-  files: ["src/workspace/WorkspaceSelectionProvider.tsx"],
-  rules: {
-    "react-refresh/only-export-components": "off",
-  },
-});
+);

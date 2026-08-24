@@ -16,7 +16,7 @@ type UseTechnicianAssignmentCountsResult = {
   refetch: () => void;
 };
 
-/** Today's active assignment counts shared by map popups and the tech candidate list. */
+/** Today's active assignment counts. Shared via useTechnicianPool. */
 export function useTechnicianAssignmentCounts(): UseTechnicianAssignmentCountsResult {
   const { data, isLoading, error, refetch } = useOsdkObjects(
     OsdkDispatchAssignment,

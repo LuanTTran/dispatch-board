@@ -9,6 +9,7 @@ export type CompareTechData = {
   label: string;
   skillsLabel: string;
   jobsLeftLabel: string;
+  jobsLeft: number | null;
   partsPath: {
     status: PartsPathStatus;
     statusLabel: string;

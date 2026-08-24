@@ -2,12 +2,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useHasLoadedOnce } from "@/hooks/useHasLoadedOnce";
 import { useOpenWorkOrders } from "@/hooks/useOpenWorkOrders";
 import { QueueList } from "@/lenses/queue/QueueList";
 import { PanelHeader } from "@/workspace/PanelHeader";
-import { QueueListSkeleton } from "@/workspace/skeletons/QueueListSkeleton";
-import { useWorkspaceSelection } from "@/workspace/WorkspaceSelectionProvider";
 import { WorkspacePanel } from "@/workspace/WorkspacePanel";
+import { useWorkspaceSelection } from "@/workspace/WorkspaceSelectionProvider";
+import { QueueListSkeleton } from "@/workspace/skeletons/QueueListSkeleton";
 
 type QueuePanelProps = {
   className?: string;
@@ -17,13 +18,14 @@ type QueuePanelProps = {
 export function QueuePanel({ className }: QueuePanelProps): React.ReactElement {
   const { items, isLoading, error, refetch, sourceCount } = useOpenWorkOrders();
   const { focusedWorkOrderId, setFocusedWorkOrderId } = useWorkspaceSelection();
+  const hasLoadedOnce = useHasLoadedOnce(isLoading);
 
   return (
     <WorkspacePanel className={className}>
       <PanelHeader
         title="OPEN"
         action={
-          isLoading ? (
+          isLoading && !hasLoadedOnce ? (
             <Skeleton className="h-5 w-8 rounded-full" />
           ) : (
             <Badge variant="secondary" className="tabular-nums">
@@ -36,15 +38,13 @@ export function QueuePanel({ className }: QueuePanelProps): React.ReactElement {
         <div className="flex flex-1 flex-col gap-3 p-panel-padding">
           <Alert variant="destructive">
             <AlertTitle>Foundry connection failed</AlertTitle>
-            <AlertDescription className="text-balance">
-              {error.message}
-            </AlertDescription>
+            <AlertDescription className="text-balance">{error.message}</AlertDescription>
           </Alert>
           <Button type="button" variant="outline" size="sm" onClick={() => refetch()}>
             Retry
           </Button>
         </div>
-      ) : isLoading ? (
+      ) : isLoading && !hasLoadedOnce ? (
         <QueueListSkeleton />
       ) : (
         <>

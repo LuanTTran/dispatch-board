@@ -4,6 +4,7 @@ import type {
   DispatchDecisionData,
   DispatchDecisionType,
 } from "@/lenses/activity/types";
+import { resolveFoundryActorLabel } from "@/utils/foundry/resolveFoundryActorLabel";
 
 type DispatchDecisionInstance = OsdkDispatchDecision.OsdkInstance;
 
@@ -26,19 +27,23 @@ function parseDecisionType(value: string | undefined): DispatchDecisionType {
 /** Maps OSDK DispatchDecision to an activity feed row. */
 export function mapDispatchDecision(
   decision: DispatchDecisionInstance,
+  usernameByUserId?: ReadonlyMap<string, string>,
 ): DispatchDecisionData {
+  const actor = decision.actor ?? "unknown";
   return {
     decisionId: decision.decisionId,
     workOrderId: decision.workOrderId ?? "—",
     decisionType: parseDecisionType(decision.decisionType),
     reason: decision.reason ?? "",
     timestamp: decision.timestamp ?? new Date(0).toISOString(),
-    actor: decision.actor ?? "unknown",
+    actor,
+    actorLabel: resolveFoundryActorLabel(actor, usernameByUserId),
   };
 }
 
 export function mapDispatchDecisions(
   decisions: readonly DispatchDecisionInstance[],
+  usernameByUserId?: ReadonlyMap<string, string>,
 ): DispatchDecisionData[] {
-  return decisions.map(mapDispatchDecision);
+  return decisions.map((decision) => mapDispatchDecision(decision, usernameByUserId));
 }

@@ -6,7 +6,7 @@ import {
   type InventorySnapshot,
 } from "@/utils/dispatch/classifyPartsPath";
 import { formatSkillsLabel } from "@/utils/dispatch/formatSkillsLabel";
-import { formatJobsLeftLabel } from "@/utils/dispatch/jobsLeftPresentation";
+import { formatJobsLeftLabel, computeJobsLeft } from "@/utils/dispatch/jobsLeftPresentation";
 import { formatAgeLabel } from "@/utils/staleness/formatAgeLabel";
 import { isLocationStale } from "@/utils/staleness/isLocationStale";
 
@@ -45,6 +45,7 @@ export function mapCompareTech({
       technician.maxDailyJobs,
       assignmentsToday,
     ),
+    jobsLeft: computeJobsLeft(technician.maxDailyJobs, assignmentsToday),
     partsPath: {
       status: partsPath.status,
       statusLabel: partsPath.statusLabel,

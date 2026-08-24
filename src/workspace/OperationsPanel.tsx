@@ -1,37 +1,39 @@
 import { useMemo, useState } from "react";
-
+import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { ActionBar } from "@/dispatch/ActionBar";
 import { ConfirmDispatchDialog } from "@/dispatch/ConfirmDispatchDialog";
+import { DispatchSuccessBanner } from "@/dispatch/DispatchSuccessBanner";
 import { HoldWorkOrderDialog } from "@/dispatch/HoldWorkOrderDialog";
 import { TechCandidateList } from "@/dispatch/TechCandidateList";
 import type { HoldWorkOrderPayload, TechCandidateData } from "@/dispatch/types";
 import { useConfirmDispatch } from "@/hooks/useConfirmDispatch";
+import { useFocusedJob } from "@/hooks/useFocusedJob";
 import { useHoldWorkOrder } from "@/hooks/useHoldWorkOrder";
-import { useSelectedTechCompare } from "@/hooks/useSelectedTechCompare";
+import { useTechCandidates } from "@/hooks/useTechCandidates";
 import { JobCardHeader } from "@/lenses/operations/JobCardHeader";
 import { JobDetailsExpander } from "@/lenses/operations/JobDetailsExpander";
+import { OperationsEmptyState } from "@/lenses/operations/OperationsEmptyState";
 import type { JobCardData } from "@/lenses/operations/types";
 import { buildConfirmDispatchActionParams } from "@/utils/dispatch/buildConfirmDispatchActionParams";
 import { buildConfirmPayload } from "@/utils/dispatch/buildConfirmPayload";
 import { formatActionValidationError } from "@/utils/dispatch/formatActionValidationError";
-import { useWorkspaceSelection } from "@/workspace/WorkspaceSelectionProvider";
-import { useFocusedJob } from "@/hooks/useFocusedJob";
-import { useTechCandidates } from "@/hooks/useTechCandidates";
-import { OperationsEmptyState } from "@/lenses/operations/OperationsEmptyState";
+import { useCompareData } from "@/workspace/CompareDataProvider";
 import { PanelHeader } from "@/workspace/PanelHeader";
-import { OperationsPanelSkeleton } from "@/workspace/skeletons/OperationsPanelSkeleton";
 import { WorkspacePanel } from "@/workspace/WorkspacePanel";
+import { useWorkspaceSelection } from "@/workspace/WorkspaceSelectionProvider";
+import { OperationsPanelSkeleton } from "@/workspace/skeletons/OperationsPanelSkeleton";
 
 type OperationsJobContentProps = {
   focusedJob: JobCardData;
   candidates: TechCandidateData[];
 };
 
-/** Job card and tech list. Compare selection is managed by WorkspaceSelectionProvider. */
+/** Job card and tech list. Compare columns come from CompareDataProvider. */
 function OperationsJobContent({
   focusedJob,
   candidates,
@@ -47,15 +49,26 @@ function OperationsJobContent({
     toggleCompareTechnician,
     selectedTechnicianId,
     setFocusedWorkOrderId,
+    confirmedDispatch,
+    markDispatchConfirmed,
   } = useWorkspaceSelection();
 
   const {
-    compareTech,
+    compareTechs,
     topPrediction,
-    jobsLeft,
-    hasConfirmedAssignmentToday,
+    confirmedTodayTechnicianIds,
     isLoading: compareLoading,
-  } = useSelectedTechCompare(focusedJob.workOrderId, selectedTechnicianId);
+  } = useCompareData();
+
+  const compareTech =
+    selectedTechnicianId != null
+      ? (compareTechs.find((tech) => tech.technicianId === selectedTechnicianId) ?? null)
+      : null;
+
+  const jobsLeft = compareTech?.jobsLeft ?? null;
+
+  const hasConfirmedAssignmentToday =
+    selectedTechnicianId != null && confirmedTodayTechnicianIds.has(selectedTechnicianId);
 
   const { confirmDispatch, isPending: confirmPending } = useConfirmDispatch();
   const { holdWorkOrder, isPending: holdPending } = useHoldWorkOrder();
@@ -76,10 +89,10 @@ function OperationsJobContent({
     [focusedJob],
   );
 
+  const isDispatched = confirmedDispatch?.workOrderId === focusedJob.workOrderId;
+
   const assignDisabled =
-    selectedTechnicianId === null ||
-    compareLoading ||
-    jobsLeft === 0;
+    isDispatched || selectedTechnicianId === null || compareLoading || jobsLeft === 0;
 
   const handleAssign = (): void => {
     setConcurrencyError(null);
@@ -106,7 +119,11 @@ function OperationsJobContent({
         buildConfirmDispatchActionParams(confirmPayload, values.overrideReason),
       );
       setConfirmOpen(false);
-      setFocusedWorkOrderId(null);
+      markDispatchConfirmed({
+        workOrderId: confirmPayload.workOrderId,
+        technicianId: confirmPayload.technicianId,
+      });
+      toast.success(`Assigned ${confirmPayload.technicianId} to ${confirmPayload.workOrderId}`);
     } catch (error) {
       setConcurrencyError(formatActionValidationError(error));
     }
@@ -128,14 +145,23 @@ function OperationsJobContent({
     }
   };
 
-  const assignLabel =
-    selectedTechnicianId !== null ? `Assign ${selectedTechnicianId}` : "Assign";
+  const assignLabel = isDispatched
+    ? "Assigned"
+    : selectedTechnicianId !== null
+      ? `Assign ${selectedTechnicianId}`
+      : "Assign";
 
   return (
     <>
       <ScrollArea className="min-h-0 flex-1">
         <div className="flex flex-col gap-3 p-panel-padding">
           <JobCardHeader job={focusedJob} />
+          {isDispatched && confirmedDispatch != null ? (
+            <DispatchSuccessBanner
+              workOrderId={confirmedDispatch.workOrderId}
+              technicianId={confirmedDispatch.technicianId}
+            />
+          ) : null}
           <Separator />
           <JobDetailsExpander
             details={focusedJob.details}
@@ -147,16 +173,16 @@ function OperationsJobContent({
             selectedIds={compareTechnicianIds}
             onToggle={toggleCompareTechnician}
           />
-          {hasConfirmedAssignmentToday && selectedTechnicianId !== null ? (
+          {hasConfirmedAssignmentToday && selectedTechnicianId !== null && !isDispatched ? (
             <Alert variant="default">
               <AlertTitle>Already dispatched today</AlertTitle>
               <AlertDescription className="text-balance">
-                {selectedTechnicianId} has a confirmed assignment today — verify
-                capacity before assigning another job.
+                {selectedTechnicianId} has a confirmed assignment today — verify capacity before
+                assigning another job.
               </AlertDescription>
             </Alert>
           ) : null}
-          {jobsLeft === 0 && selectedTechnicianId !== null ? (
+          {jobsLeft === 0 && selectedTechnicianId !== null && !isDispatched ? (
             <Alert variant="destructive">
               <AlertTitle>Daily cap reached</AlertTitle>
               <AlertDescription className="text-balance">
@@ -167,6 +193,7 @@ function OperationsJobContent({
           <ActionBar
             assignDisabled={assignDisabled}
             assignLabel={assignLabel}
+            holdDisabled={isDispatched}
             onAssign={handleAssign}
             onHold={handleHold}
           />
@@ -200,7 +227,7 @@ type OperationsPanelProps = {
 
 /** Operations column with job card and tech candidates from the Foundry ontology. */
 export function OperationsPanel({ className }: OperationsPanelProps): React.ReactElement {
-  const { focusedWorkOrderId } = useWorkspaceSelection();
+  const { focusedWorkOrderId, confirmedDispatch } = useWorkspaceSelection();
   const { job, isLoading: jobLoading, error: jobError } = useFocusedJob(focusedWorkOrderId);
   const {
     candidates,
@@ -209,11 +236,23 @@ export function OperationsPanel({ className }: OperationsPanelProps): React.Reac
     refetch: refetchTechCandidates,
   } = useTechCandidates();
 
-  const showJobSkeleton = focusedWorkOrderId !== null && (jobLoading || techLoading);
+  const showJobSkeleton = focusedWorkOrderId !== null && job == null && (jobLoading || techLoading);
 
   return (
     <WorkspacePanel className={className}>
-      <PanelHeader title="Operations" />
+      <PanelHeader
+        title="Operations"
+        action={
+          confirmedDispatch?.workOrderId === focusedWorkOrderId ? (
+            <Badge
+              variant="secondary"
+              className="bg-status-success-muted text-status-success-foreground"
+            >
+              Dispatched
+            </Badge>
+          ) : undefined
+        }
+      />
       {focusedWorkOrderId === null ? (
         <OperationsEmptyState />
       ) : showJobSkeleton ? (
@@ -253,11 +292,7 @@ export function OperationsPanel({ className }: OperationsPanelProps): React.Reac
               </Button>
             </div>
           ) : null}
-          <OperationsJobContent
-            key={focusedWorkOrderId}
-            focusedJob={job}
-            candidates={candidates}
-          />
+          <OperationsJobContent key={focusedWorkOrderId} focusedJob={job} candidates={candidates} />
         </>
       )}
     </WorkspacePanel>

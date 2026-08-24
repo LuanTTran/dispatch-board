@@ -1,14 +1,15 @@
-import { _osdkWorkOrder, OsdkCustomerSite } from "@dispatch-command-board/sdk";
+import { OsdkCustomerSite } from "@dispatch-command-board/sdk";
 import { useOsdkObjects } from "@osdk/react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
-import {
-  OPEN_QUEUE_FILTER,
-  OPEN_QUEUE_PAGE_SIZE,
-} from "@/constants/queue";
 import { CUSTOMER_SITES_PAGE_SIZE } from "@/constants/spatial";
+import { useOpenWorkOrderPoolData } from "@/hooks/useOpenWorkOrderPool";
 import type { MapSiteData } from "@/spatial/types";
 import { buildMapSitesFromOntology } from "@/utils/spatial/mapMapSite";
+
+const CUSTOMER_SITES_QUERY = {
+  pageSize: CUSTOMER_SITES_PAGE_SIZE,
+};
 
 type UseMapSitesResult = {
   sites: MapSiteData[];
@@ -17,37 +18,31 @@ type UseMapSitesResult = {
   refetch: () => void;
 };
 
-/** Site pins reuse the OPEN queue WorkOrder cache and join CustomerSite by siteId. */
+/** Site pins join the shared OPEN work-order pool with CustomerSite by siteId. */
 export function useMapSites(): UseMapSitesResult {
   const {
-    data: workOrders,
+    workOrders,
     isLoading: workOrdersLoading,
     error: workOrdersError,
     refetch: refetchWorkOrders,
-  } = useOsdkObjects(_osdkWorkOrder, {
-    where: { ...OPEN_QUEUE_FILTER },
-    orderBy: { slaDeadline: "asc" },
-    pageSize: OPEN_QUEUE_PAGE_SIZE,
-  });
+  } = useOpenWorkOrderPoolData();
 
   const {
     data: customerSites,
     isLoading: customerSitesLoading,
     error: customerSitesError,
     refetch: refetchCustomerSites,
-  } = useOsdkObjects(OsdkCustomerSite, {
-    pageSize: CUSTOMER_SITES_PAGE_SIZE,
-  });
+  } = useOsdkObjects(OsdkCustomerSite, CUSTOMER_SITES_QUERY);
 
   const sites = useMemo(
-    () => buildMapSitesFromOntology(workOrders ?? [], customerSites ?? []),
+    () => buildMapSitesFromOntology(workOrders, customerSites ?? []),
     [workOrders, customerSites],
   );
 
-  const refetch = (): void => {
+  const refetch = useCallback((): void => {
     refetchWorkOrders();
     refetchCustomerSites();
-  };
+  }, [refetchWorkOrders, refetchCustomerSites]);
 
   return {
     sites,

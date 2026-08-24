@@ -1,14 +1,14 @@
 import type {
-  _osdkPartPrediction,
-  _osdkWorkOrder,
   OsdkCustomerSite,
   OsdkDispatchDecision,
   OsdkEquipment,
   OsdkHubInventory,
+  _osdkPartPrediction,
+  _osdkWorkOrder,
 } from "@dispatch-command-board/sdk";
-
 import type { JobCardData } from "@/lenses/operations/types";
 import { formatTimestampLabel } from "@/utils/format/formatTimestampLabel";
+import { resolveFoundryActorLabel } from "@/utils/foundry/resolveFoundryActorLabel";
 import { formatSlaLabel } from "@/utils/queue/slaPresentation";
 import { classifyInventoryStalenessLabel } from "@/utils/staleness/classifyInventoryStaleness";
 import { formatAgeLabel } from "@/utils/staleness/formatAgeLabel";
@@ -27,6 +27,8 @@ export type MapFocusedJobInput = {
   predictions: readonly PartPredictionInstance[];
   hubInventory: HubInventoryInstance | undefined;
   priorDecisions: readonly DispatchDecisionInstance[];
+  /** Foundry user id → display name, used when audit actor is a user UUID. */
+  actorDisplayNames?: ReadonlyMap<string, string>;
   nowMs?: number;
 };
 
@@ -74,12 +76,15 @@ function formatDecisionSummary(decision: DispatchDecisionInstance): string {
   return decision.decisionType?.replace(/_/g, " ") ?? "Decision";
 }
 
-function formatActorLabel(actor: string | undefined): string {
+function formatActorLabel(
+  actor: string | undefined,
+  actorDisplayNames?: ReadonlyMap<string, string>,
+): string {
   if (actor == null) {
     return "Unknown";
   }
 
-  return actor.replace(/^coordinator\./, "");
+  return resolveFoundryActorLabel(actor, actorDisplayNames);
 }
 
 /** Maps OSDK WorkOrder and linked objects to the operations job card view model. */
@@ -90,6 +95,7 @@ export function mapFocusedJob({
   predictions,
   hubInventory,
   priorDecisions,
+  actorDisplayNames,
   nowMs = Date.now(),
 }: MapFocusedJobInput): JobCardData {
   const sortedPredictions = [...predictions].sort(
@@ -103,11 +109,7 @@ export function mapFocusedJob({
     slaLabel: formatSlaLabel(workOrder.slaDeadline, nowMs),
     priorityLabel: formatPriorityLabel(workOrder.priority),
     siteOneLiner: formatSiteOneLiner(customerSite),
-    equipmentOneLiner: formatEquipmentOneLiner(
-      equipment,
-      topSkuId,
-      workOrder.symptom,
-    ),
+    equipmentOneLiner: formatEquipmentOneLiner(equipment, topSkuId, workOrder.symptom),
     symptom: workOrder.symptom ?? "Symptom unavailable",
     details: {
       site: {
@@ -129,14 +131,11 @@ export function mapFocusedJob({
         skuId: topSkuId ?? hubInventory?.skuId ?? "—",
         quantity: Number(hubInventory?.quantity ?? 0),
         asOfLabel: formatAgeLabel(hubInventory?.asOfTimestamp),
-        stalenessLabel: classifyInventoryStalenessLabel(
-          hubInventory?.asOfTimestamp,
-          nowMs,
-        ),
+        stalenessLabel: classifyInventoryStalenessLabel(hubInventory?.asOfTimestamp, nowMs),
       },
       priorDecisions: priorDecisions.map((decision) => ({
         timestampLabel: formatTimestampLabel(decision.timestamp),
-        actor: formatActorLabel(decision.actor),
+        actor: formatActorLabel(decision.actor, actorDisplayNames),
         summary: formatDecisionSummary(decision),
       })),
     },

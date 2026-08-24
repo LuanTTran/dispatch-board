@@ -4,6 +4,10 @@ The command center shell. Four panels plus a footer share one selection state (f
 
 - `CommandCenterShell.tsx` — Main layout grid: queue, header, map, operations, compare, activity footer.
 - `WorkspaceSelectionProvider.tsx` — Shared context for focused work order, compare tech IDs, assign target, and focus source.
+- `FoundryCurrentUserProvider.tsx` — Current Foundry user plus a UUID/RID → username map for activity actors.
+- `OpenWorkOrderPoolProvider.tsx` — One OPEN-queue work-order fetch shared by the queue list and map site pins.
+- `TechnicianPoolProvider.tsx` — One Chicago-hub tech and assignment fetch shared by map pins, candidates, and compare.
+- `CompareDataProvider.tsx` — One compare fetch graph shared by operations confirm and the compare strip.
 - `focusSource.ts` — Tracks whether focus came from the queue or the map (drives map popup behavior).
 - `WorkspacePanel.tsx` — Rounded card wrapper used by every panel.
 - `PanelHeader.tsx` — Panel title row with optional trailing action slot.

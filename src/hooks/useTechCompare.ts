@@ -1,32 +1,43 @@
 import {
-  _osdkTechnician,
   _osdkTruckInventory,
   _osdkWorkOrder,
   OsdkHubInventory,
 } from "@dispatch-command-board/sdk";
 import { useLinks, useOsdkObject, useOsdkObjects } from "@osdk/react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { CHICAGO_HUB_ID } from "@/constants/dispatch";
+import type { UseTechnicianPoolResult } from "@/hooks/useTechnicianPool";
 import type { CompareTechData } from "@/lenses/compare/types";
-import { useTechnicianAssignmentCounts } from "@/hooks/useTechnicianAssignmentCounts";
 import { mapCompareTech } from "@/utils/dispatch/mapCompareTech";
+import type { TopPrediction } from "@/utils/dispatch/buildConfirmPayload";
 
-type UseTechCompareResult = {
+export type UseTechCompareResult = {
   compareTechs: CompareTechData[];
+  topPrediction: TopPrediction | null;
+  confirmedTodayTechnicianIds: ReadonlySet<string>;
   isLoading: boolean;
   error: Error | undefined;
   refetch: () => void;
 };
 
-/** Side-by-side compare columns with work order predictions, per-tech truck rows, and a shared hub row. */
+/** Compare columns for 1–2 selected techs: predictions, truck/hub path, and pool assignments. */
 export function useTechCompare(
   focusedWorkOrderId: string | null,
   compareTechnicianIds: readonly string[],
+  pool: UseTechnicianPoolResult,
 ): UseTechCompareResult {
+  const {
+    technicians,
+    countsByTechnicianId,
+    confirmedTodayTechnicianIds,
+    isLoading: poolLoading,
+    error: poolError,
+    refetch: refetchPool,
+  } = pool;
+
   const compareEnabled =
     focusedWorkOrderId != null && compareTechnicianIds.length > 0;
-  const inventoryEnabled = compareEnabled && compareTechnicianIds.length === 2;
 
   const {
     object: workOrder,
@@ -48,63 +59,52 @@ export function useTechCompare(
 
   const topSkuId = predictions?.[0]?.skuId;
   const predictionsReady = workOrder != null && !predictionsLoading;
-  const stripEnabled = inventoryEnabled && predictionsReady;
-  const inventoryFetchEnabled = stripEnabled && topSkuId != null;
+  const columnsEnabled = compareEnabled && predictionsReady;
+  const inventoryFetchEnabled = columnsEnabled && topSkuId != null;
 
-  const {
-    data: technicians,
-    isLoading: techniciansLoading,
-    error: techniciansError,
-    refetch: refetchTechnicians,
-  } = useOsdkObjects(_osdkTechnician, {
-    where: { technicianId: { $in: [...compareTechnicianIds] } },
-    pageSize: compareTechnicianIds.length,
-    enabled: stripEnabled,
-  });
+  const truckQuery = useMemo(
+    () => ({
+      where: {
+        skuId: topSkuId,
+        technicianId: { $in: [...compareTechnicianIds] },
+      },
+      pageSize: compareTechnicianIds.length,
+      enabled: inventoryFetchEnabled,
+    }),
+    [topSkuId, compareTechnicianIds, inventoryFetchEnabled],
+  );
 
   const {
     data: truckRows,
     isLoading: truckLoading,
     error: truckError,
     refetch: refetchTruck,
-  } = useOsdkObjects(_osdkTruckInventory, {
-    where: {
-      skuId: topSkuId,
-      technicianId: { $in: [...compareTechnicianIds] },
-    },
-    pageSize: compareTechnicianIds.length,
-    enabled: inventoryFetchEnabled,
-  });
+  } = useOsdkObjects(_osdkTruckInventory, truckQuery);
+
+  const hubQuery = useMemo(
+    () => ({
+      where: { hubId: CHICAGO_HUB_ID, skuId: topSkuId },
+      pageSize: 1,
+      enabled: inventoryFetchEnabled,
+    }),
+    [topSkuId, inventoryFetchEnabled],
+  );
 
   const {
     data: hubRows,
     isLoading: hubLoading,
     error: hubError,
     refetch: refetchHub,
-  } = useOsdkObjects(OsdkHubInventory, {
-    where: { hubId: CHICAGO_HUB_ID, skuId: topSkuId },
-    pageSize: 1,
-    enabled: inventoryFetchEnabled,
-  });
-
-  const {
-    countsByTechnicianId,
-    isLoading: assignmentsLoading,
-    error: assignmentsError,
-    refetch: refetchAssignments,
-  } = useTechnicianAssignmentCounts();
+  } = useOsdkObjects(OsdkHubInventory, hubQuery);
 
   const compareTechs = useMemo(() => {
-    if (!stripEnabled) {
+    if (!columnsEnabled) {
       return [];
     }
 
     const skuId = topSkuId ?? "—";
     const technicianById = new Map(
-      (technicians ?? []).map((technician) => [
-        technician.technicianId,
-        technician,
-      ]),
+      technicians.map((technician) => [technician.technicianId, technician]),
     );
     const truckByTechnicianId = new Map(
       (truckRows ?? []).map((row) => [row.technicianId, row]),
@@ -139,47 +139,52 @@ export function useTechCompare(
           skuId,
           truckInventory,
           hubInventory,
-          assignmentsToday:
-            countsByTechnicianId.get(technicianId) ?? 0,
+          assignmentsToday: countsByTechnicianId.get(technicianId) ?? 0,
         }),
       ];
     });
   }, [
-    stripEnabled,
+    columnsEnabled,
     topSkuId,
     technicians,
+    countsByTechnicianId,
     truckRows,
     hubRows,
     compareTechnicianIds,
-    countsByTechnicianId,
   ]);
 
-  const refetch = (): void => {
+  const topPrediction = useMemo((): TopPrediction | null => {
+    const row = predictions?.[0];
+    if (row?.skuId == null) {
+      return null;
+    }
+
+    return {
+      skuId: row.skuId,
+      confidence: row.confidence ?? 0,
+    };
+  }, [predictions]);
+
+  const refetch = useCallback((): void => {
     forceUpdateWorkOrder();
-    refetchTechnicians();
     refetchTruck();
     refetchHub();
-    refetchAssignments();
-  };
+    refetchPool();
+  }, [forceUpdateWorkOrder, refetchTruck, refetchHub, refetchPool]);
 
   const isLoading =
     compareEnabled &&
     (workOrderLoading ||
       predictionsLoading ||
-      (inventoryEnabled &&
-        (techniciansLoading ||
-          assignmentsLoading ||
-          (topSkuId != null && (truckLoading || hubLoading)))));
+      poolLoading ||
+      (topSkuId != null && (truckLoading || hubLoading)));
 
   return {
     compareTechs,
+    topPrediction,
+    confirmedTodayTechnicianIds,
     isLoading,
-    error:
-      workOrderError ??
-      techniciansError ??
-      truckError ??
-      hubError ??
-      assignmentsError,
+    error: workOrderError ?? truckError ?? hubError ?? poolError,
     refetch,
   };
 }

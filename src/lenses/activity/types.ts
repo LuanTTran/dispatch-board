@@ -14,7 +14,10 @@ export type DispatchDecisionData = {
   reason: string;
   /** ISO 8601 timestamp with offset. Demo anchor is 2026-07-29 evening rush. */
   timestamp: string;
+  /** Raw ontology actor (user id, RID, or seed slug). */
   actor: string;
+  /** Username (or seed Alice/Bob) for display. */
+  actorLabel: string;
 };
 
 /** Visible recent rows in the activity footer strip. */

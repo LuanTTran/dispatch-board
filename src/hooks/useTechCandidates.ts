@@ -1,13 +1,7 @@
-import { _osdkTechnician } from "@dispatch-command-board/sdk";
-import { useOsdkObjects } from "@osdk/react";
 import { useMemo } from "react";
 
-import {
-  TECH_CANDIDATES_FILTER,
-  TECH_CANDIDATES_PAGE_SIZE,
-} from "@/constants/dispatch";
 import type { TechCandidateData } from "@/dispatch/types";
-import { useTechnicianAssignmentCounts } from "@/hooks/useTechnicianAssignmentCounts";
+import { useTechnicianPoolData } from "@/hooks/useTechnicianPool";
 import { mapTechCandidates } from "@/utils/operations/mapTechCandidate";
 
 type UseTechCandidatesResult = {
@@ -17,40 +11,20 @@ type UseTechCandidatesResult = {
   refetch: () => void;
 };
 
-/** Central-region technician pool filtered by Chicago home hub. */
+/** Candidate checkbox rows from the shared Chicago-hub technician pool. */
 export function useTechCandidates(): UseTechCandidatesResult {
-  const {
-    data,
-    isLoading: techniciansLoading,
-    error: techniciansError,
-    refetch: refetchTechnicians,
-  } = useOsdkObjects(_osdkTechnician, {
-    where: { ...TECH_CANDIDATES_FILTER },
-    orderBy: { technicianId: "asc" },
-    pageSize: TECH_CANDIDATES_PAGE_SIZE,
-  });
-
-  const {
-    countsByTechnicianId,
-    isLoading: assignmentsLoading,
-    error: assignmentsError,
-    refetch: refetchAssignments,
-  } = useTechnicianAssignmentCounts();
+  const { technicians, countsByTechnicianId, isLoading, error, refetch } =
+    useTechnicianPoolData();
 
   const candidates = useMemo(
-    () => mapTechCandidates(data ?? [], countsByTechnicianId),
-    [data, countsByTechnicianId],
+    () => mapTechCandidates(technicians, countsByTechnicianId),
+    [technicians, countsByTechnicianId],
   );
-
-  const refetch = (): void => {
-    refetchTechnicians();
-    refetchAssignments();
-  };
 
   return {
     candidates,
-    isLoading: techniciansLoading || assignmentsLoading,
-    error: techniciansError ?? assignmentsError,
+    isLoading,
+    error,
     refetch,
   };
 }

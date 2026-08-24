@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 type ActionBarProps = {
   assignDisabled: boolean;
   assignLabel?: string;
+  holdDisabled?: boolean;
   onAssign: () => void;
   onHold: () => void;
 };
@@ -11,6 +12,7 @@ type ActionBarProps = {
 export function ActionBar({
   assignDisabled,
   assignLabel = "Assign",
+  holdDisabled = false,
   onAssign,
   onHold,
 }: ActionBarProps): React.ReactElement {
@@ -19,7 +21,7 @@ export function ActionBar({
       <Button type="button" disabled={assignDisabled} onClick={onAssign}>
         {assignLabel}
       </Button>
-      <Button type="button" variant="outline" onClick={onHold}>
+      <Button type="button" variant="outline" disabled={holdDisabled} onClick={onHold}>
         Hold — parts pick
       </Button>
     </div>

@@ -4,6 +4,7 @@ import type { CompareTechData } from "@/lenses/compare/types";
 type CompareStripProps = {
   techs: CompareTechData[];
   assignTargetId: string | null;
+  dispatchedTechnicianId?: string | null;
   onSelectAssignTarget: (technicianId: string) => void;
 };
 
@@ -11,6 +12,7 @@ type CompareStripProps = {
 export function CompareStrip({
   techs,
   assignTargetId,
+  dispatchedTechnicianId = null,
   onSelectAssignTarget,
 }: CompareStripProps): React.ReactElement {
   return (
@@ -20,6 +22,8 @@ export function CompareStrip({
           key={tech.technicianId}
           tech={tech}
           isAssignTarget={assignTargetId === tech.technicianId}
+          isAssigned={dispatchedTechnicianId === tech.technicianId}
+          assignLocked={dispatchedTechnicianId != null}
           onSelectForAssign={() => onSelectAssignTarget(tech.technicianId)}
         />
       ))}

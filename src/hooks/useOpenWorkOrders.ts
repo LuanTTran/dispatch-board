@@ -1,11 +1,6 @@
-import { _osdkWorkOrder } from "@dispatch-command-board/sdk";
-import { useOsdkObjects } from "@osdk/react";
 import { useMemo } from "react";
 
-import {
-  OPEN_QUEUE_FILTER,
-  OPEN_QUEUE_PAGE_SIZE,
-} from "@/constants/queue";
+import { useOpenWorkOrderPoolData } from "@/hooks/useOpenWorkOrderPool";
 import type { QueueListItemData } from "@/lenses/queue/types";
 import { mapWorkOrdersToQueueItems } from "@/utils/queue/mapWorkOrderToQueueItem";
 
@@ -18,17 +13,13 @@ type UseOpenWorkOrdersResult = {
   sourceCount: number;
 };
 
-/** Fetches OPEN urgent work orders from OSDK. Triggers OAuth when unauthenticated. */
+/** Queue rows mapped from the shared OPEN work-order pool. */
 export function useOpenWorkOrders(): UseOpenWorkOrdersResult {
-  const { data, isLoading, error, refetch } = useOsdkObjects(_osdkWorkOrder, {
-    where: { ...OPEN_QUEUE_FILTER },
-    orderBy: { slaDeadline: "asc" },
-    pageSize: OPEN_QUEUE_PAGE_SIZE,
-  });
+  const { workOrders, isLoading, error, refetch } = useOpenWorkOrderPoolData();
 
   const items = useMemo(
-    () => mapWorkOrdersToQueueItems(data ?? []),
-    [data],
+    () => mapWorkOrdersToQueueItems(workOrders),
+    [workOrders],
   );
 
   return {
@@ -36,6 +27,6 @@ export function useOpenWorkOrders(): UseOpenWorkOrdersResult {
     isLoading,
     error,
     refetch,
-    sourceCount: data?.length ?? 0,
+    sourceCount: workOrders.length,
   };
 }

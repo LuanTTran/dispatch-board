@@ -1,13 +1,10 @@
-import {
-  _osdkWorkOrder,
-  OsdkHubInventory,
-} from "@dispatch-command-board/sdk";
-import { useLinks, useOsdkObject, useOsdkObjects } from "@osdk/react";
 import { useMemo } from "react";
-
+import { useLinks, useOsdkObject, useOsdkObjects } from "@osdk/react";
+import { OsdkHubInventory, _osdkWorkOrder } from "@dispatch-command-board/sdk";
 import { CHICAGO_HUB_ID } from "@/constants/dispatch";
 import type { JobCardData } from "@/lenses/operations/types";
 import { mapFocusedJob } from "@/utils/operations/mapFocusedJob";
+import { useFoundryCurrentUser } from "@/workspace/FoundryCurrentUserProvider";
 
 type UseFocusedJobResult = {
   job: JobCardData | null;
@@ -17,6 +14,7 @@ type UseFocusedJobResult = {
 
 /** Focused work order job card with WorkOrder instance and investigative links for the operations panel. */
 export function useFocusedJob(workOrderId: string | null): UseFocusedJobResult {
+  const { displayNameByUserId } = useFoundryCurrentUser();
   const isEnabled = workOrderId != null;
 
   const {
@@ -27,11 +25,9 @@ export function useFocusedJob(workOrderId: string | null): UseFocusedJobResult {
     enabled: isEnabled,
   });
 
-  const { links: customerSites, isLoading: siteLoading } = useLinks(
-    workOrder,
-    "osdkCustomerSite",
-    { enabled: workOrder != null },
-  );
+  const { links: customerSites, isLoading: siteLoading } = useLinks(workOrder, "osdkCustomerSite", {
+    enabled: workOrder != null,
+  });
 
   const { links: equipmentRows, isLoading: equipmentLoading } = useLinks(
     workOrder,
@@ -60,14 +56,11 @@ export function useFocusedJob(workOrderId: string | null): UseFocusedJobResult {
   const topSkuId = predictions?.[0]?.skuId;
   const hubQueryEnabled = topSkuId != null;
 
-  const { data: hubInventoryRows, isLoading: hubLoading } = useOsdkObjects(
-    OsdkHubInventory,
-    {
-      where: { hubId: CHICAGO_HUB_ID, skuId: topSkuId },
-      pageSize: 1,
-      enabled: hubQueryEnabled,
-    },
-  );
+  const { data: hubInventoryRows, isLoading: hubLoading } = useOsdkObjects(OsdkHubInventory, {
+    where: { hubId: CHICAGO_HUB_ID, skuId: topSkuId },
+    pageSize: 1,
+    enabled: hubQueryEnabled,
+  });
 
   const job = useMemo(() => {
     if (workOrder == null) {
@@ -81,6 +74,7 @@ export function useFocusedJob(workOrderId: string | null): UseFocusedJobResult {
       predictions: predictions ?? [],
       hubInventory: hubInventoryRows?.[0],
       priorDecisions: priorDecisions ?? [],
+      actorDisplayNames: displayNameByUserId,
     });
   }, [
     workOrder,
@@ -89,6 +83,7 @@ export function useFocusedJob(workOrderId: string | null): UseFocusedJobResult {
     predictions,
     hubInventoryRows,
     priorDecisions,
+    displayNameByUserId,
   ]);
 
   const isLoading =

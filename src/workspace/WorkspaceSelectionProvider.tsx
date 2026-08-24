@@ -1,29 +1,28 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
-
 import { MAX_COMPARE_TECHNICIANS } from "@/lenses/compare/types";
-import type {
-  SetFocusedWorkOrderOptions,
-  WorkOrderFocusSource,
-} from "@/workspace/focusSource";
+import type { SetFocusedWorkOrderOptions, WorkOrderFocusSource } from "@/workspace/focusSource";
+
+export type ConfirmedDispatch = {
+  workOrderId: string;
+  technicianId: string;
+};
 
 type WorkspaceSelectionContextValue = {
   focusedWorkOrderId: string | null;
   focusSource: WorkOrderFocusSource | null;
-  setFocusedWorkOrderId: (
-    workOrderId: string | null,
-    options?: SetFocusedWorkOrderOptions,
-  ) => void;
+  setFocusedWorkOrderId: (workOrderId: string | null, options?: SetFocusedWorkOrderOptions) => void;
   compareTechnicianIds: string[];
   toggleCompareTechnician: (technicianId: string) => void;
   /** Explicit assign target when two technicians are compared. Auto-derived when only one is selected. */
   assignTargetId: string | null;
   selectedTechnicianId: string | null;
   selectAssignTarget: (technicianId: string) => void;
+  /** Last successful confirm for the currently focused work order. Cleared on focus change. */
+  confirmedDispatch: ConfirmedDispatch | null;
+  markDispatchConfirmed: (value: ConfirmedDispatch) => void;
 };
 
-const WorkspaceSelectionContext = createContext<WorkspaceSelectionContextValue | null>(
-  null,
-);
+const WorkspaceSelectionContext = createContext<WorkspaceSelectionContextValue | null>(null);
 
 type WorkspaceSelectionProviderProps = {
   children: React.ReactNode;
@@ -44,18 +43,22 @@ export function WorkspaceSelectionProvider({
   );
   const [compareTechnicianIds, setCompareTechnicianIds] = useState<string[]>([]);
   const [assignTargetId, setAssignTargetId] = useState<string | null>(null);
+  const [confirmedDispatch, setConfirmedDispatch] = useState<ConfirmedDispatch | null>(null);
 
   const setFocusedWorkOrderId = useCallback(
     (workOrderId: string | null, options?: SetFocusedWorkOrderOptions) => {
       setFocusedWorkOrderIdState(workOrderId);
-      setFocusSource(
-        workOrderId != null ? (options?.source ?? "map") : null,
-      );
+      setFocusSource(workOrderId != null ? (options?.source ?? "map") : null);
       setCompareTechnicianIds([]);
       setAssignTargetId(null);
+      setConfirmedDispatch(null);
     },
     [],
   );
+
+  const markDispatchConfirmed = useCallback((value: ConfirmedDispatch) => {
+    setConfirmedDispatch(value);
+  }, []);
 
   const toggleCompareTechnician = useCallback((technicianId: string) => {
     setCompareTechnicianIds((current) => {
@@ -103,12 +106,16 @@ export function WorkspaceSelectionProvider({
       assignTargetId,
       selectedTechnicianId,
       selectAssignTarget,
+      confirmedDispatch,
+      markDispatchConfirmed,
     }),
     [
       assignTargetId,
       compareTechnicianIds,
+      confirmedDispatch,
       focusSource,
       focusedWorkOrderId,
+      markDispatchConfirmed,
       selectAssignTarget,
       selectedTechnicianId,
       setFocusedWorkOrderId,
