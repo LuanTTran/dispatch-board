@@ -14,7 +14,7 @@ export const SLA_URGENCY_THRESHOLDS_MIN = {
 
 export const OPEN_QUEUE_PAGE_SIZE = 40;
 
-/** Urgency bucket materialized on WorkOrder by flatten_timestamps. Drives queue dot styling. */
+/** Urgency bucket materialized on WorkOrder by flatten_timestamps. OVERDUE forces critical styling. */
 export const URGENCY_BUCKET = {
   OVERDUE: "OVERDUE",
   DUE_SOON: "DUE_SOON",

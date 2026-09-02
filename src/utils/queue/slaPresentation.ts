@@ -64,20 +64,19 @@ export function classifyQueueUrgency(
   return "normal";
 }
 
-/** Maps ontology urgency bucket to queue row styling. Falls back to SLA math when unset. */
+/**
+ * Maps ontology urgency bucket to queue/map styling.
+ * OVERDUE is always critical. DUE_SOON/ON_TRACK still run live SLA math so
+ * jobs inside the critical window (e.g. 1m left) paint red, not yellow.
+ */
 export function mapUrgencyBucketToQueueUrgency(
   urgencyBucket: string | undefined,
   slaDeadline: string | Date | undefined,
   nowMs: number = Date.now(),
 ): QueueUrgency {
-  switch (urgencyBucket as UrgencyBucket | undefined) {
-    case URGENCY_BUCKET.OVERDUE:
-      return "critical";
-    case URGENCY_BUCKET.DUE_SOON:
-      return "warning";
-    case URGENCY_BUCKET.ON_TRACK:
-      return "normal";
-    default:
-      return classifyQueueUrgency(slaDeadline, nowMs);
+  if ((urgencyBucket as UrgencyBucket | undefined) === URGENCY_BUCKET.OVERDUE) {
+    return "critical";
   }
+
+  return classifyQueueUrgency(slaDeadline, nowMs);
 }

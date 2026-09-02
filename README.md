@@ -4,7 +4,7 @@ One screen for the person who sends techs to urgent refrigeration jobs around Ch
 
 This is an open source demo built on Palantir Foundry. It shows how a real dispatch desk could work when work orders, parts, trucks, and the warehouse all live in one place instead of four different tools.
 
-> **Note:** Inspired by public field service stories (including Parts Town’s AIP conference narrative). This is a learning project with fake data. It's not affiliated with or endorsed by Parts Town or any customer.
+> **Note:** Inspired by public field service stories. It's not affiliated with or endorsed by Parts Town or any customer.
 
 ---
 
@@ -384,4 +384,4 @@ npm run test       # Vitest (env tests skipped unless VERIFY_ENV_PRODUCTION=true
 
 ## License and disclaimer
 
-Synthetic data only. Use this repo to learn Foundry + OSDK patterns for dispatch workflows. Replace placeholder GitHub URL and env values with your own before sharing.
+Synthetic data only. Replace placeholder GitHub URL and env values with your own before sharing.
